@@ -1,0 +1,562 @@
+query selector all je node list nije array
+,ali mozes koristiti forEaxh metodu.
+
+DOM
+-interface between javascript code and the browser
+
+-html documents that are rendered in by the browser
+
+-allows to make javascript interact with the browser
+
+-we can write Java script to create,modify and delete
+HTML elements,set styles ,classes and attributes and
+listen and respond to events
+
+- DOM tree is generated from an HTML document, which we can then
+  interact with
+
+  -DOM is very complex API that contains lots
+  of methods and properties to interact with the DOM tree.
+
+  -DOM je pisan u NODE-u(represented by JavaSc object)
+  DOM API is broken into diffrent types of nodes and
+  HTML elements are also NODES.
+  -each type of nodes have acces to diffrent methods and
+  properties some of them even inherit more methods and
+  properties from their parent nodes.
+  -.querySelector available on document and element types
+
+  EVENTTarget& Window -global scope svima available
+  NODE-element==>HTML element==>HTMLButtonElement&HTMLDivElement,text,comment,document
+
+SELECTING,CREATING AND DELETING ELEMENTS:
+
+Selecting:
+document.documentElement-select cijeli html element za styles
+document.body-select b
+document.head-select h
+-za ovo netreba selector
+
+document.querySelector(`.header`);-prvi element sa tom klasom
+document.querySelectorAll(`.section`);-svi elementi sa klasom - i nodelist sve sa klasom
+
+document.getElementById(`section--1`);-element sa tim id
+
+document.getElementsByTagName(`button`)-svi buttoni-DOBIS HTML COLLECTION(LIVE COLLECTION) , A NE NODE LIST
+
+document.getElementsByClassName(`btn`);-ko id samo dobis html collection isto
+
+CREATING AND INSERTING ELEMENTS:
+.insertAdjacentHTML(positon,text) -insert
+ovo su sve pozicije ispod
+
+"beforebegin"
+Before the element. Only valid if the element is in the DOM tree and has a parent element.
+
+"afterbegin"
+Just inside the element, before its first child.
+
+"beforeend"
+Just inside the element, after its last child.
+
+"afterend"
+After the element. Only valid if the element is in the DOM tree and has a parent element.
+
+document.createElement(`div`);
+
+header.prepend(message);-adds an element message as first child
+of header element.
+
+.append -last child- prvo se inserta onda se pomice element naizme+jenice sa prepend i append.
+
+.cloneNode(true)-kopira element da mozes kopirat vise elemenata sa prepend metodom.
+
+.before(element)-inserta prije
+.after(element)-insterta nakon
+
+DELETE:
+
+document.querySelector(`.btn--close-cookie`)
+.addEventListener(`click`, function () {
+message.remove();
+});
+-remove()-novo moderno prije je treebalo parent shits pisat
+
+STYLES.ATRIBUTES AND CLASSES:
+message.style.height =
+Number.parseFloat(getComputedStyle(message).height) + 144 + `px`;
+-mijenjas height elementa message
+
+document.documentElement.style.setProperty(`--color-primary`name of the property, `orangered` value);-glavna boja cijelog htmla orange.
+
+-with custom properties nemozemo sa backgroundColor
+
+ATRIBUTES:
+src,alt,class,id
+
+logo.getAtribute(`designer`)-za pravu lokaciju slike npr i bilo koji
+drugi atribut
+
+logo.setAttribute(`company`, `Bankist`)-get company i setaj je na bankist-novi atribt company=Bankist
+
+logo.alt = `novi settani tekst`
+
+DATA ATRIBUTES:
+-special kind of atributes that start with a word
+data.
+html= data-version-number -prebaci u camelcase za dolje koristit
+
+logo.dataset.versionNumber
+
+-za Ui I ZA STORANJE DATE U HTML.
+
+Classes:
+logo.classList.add(`c`, `j`)
+logo.classList.remove(`c`)
+logo.classList.toggle(`c`)
+logo.classList.contains(`c`)
+
+SMOOTH SCROLLING:
+
+sectionhtml.getBoundingClientRect()-dobis info o elementu na kojoj je visini, width,top..,
+
+btnScrollTo.addEventListener(`click`, function (e) {
+section1.scrollIntoView({ behavior: `smooth` });
+});
+-na klik scroolal na drugu stranicu dolje
+
+EVENTS AND EVENT HANDLERS:
+elem.removeEventListener-za kad nesto hoces samo jednom
+koristiti pa da se nemre ponovno aktrivirat
+
+EVENT PROPAGATION: BUBBLING phase AND CAPTURING phase
+
+-events propagating from one place to another.
+
+-kad se event zatraži putuje po DOM treeju iz dokumenta sve do
+najnizeg trazenog parenta tamo target
+phase aktivira event listenera
+pa se nakon aktivacije opet diže po
+dom drvu gore kroz svakog parenta, ali ne sibling elementa
+kao bubbles izato se zove bubbling phase
+-event ko da se desio u svako parent elementu
+
+-EVENTS can only be handled at target and bubbly phase,
+ali mmozemo staviti eventlisteners da koristimo i u capturing
+phase isto.
+
+-neki eventi samo target phase,ali vecina bubble i target.
+
+EVENT PRAKSA:
+
+-random boja
+
+const randomInt = (min, max) =>
+Math.floor(Math.random() \* (max - min + 1) + min);
+
+const randomColor = () => `rgb(${randomInt(0, 255)} ,
+  ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
+
+-ako npr mijenjas boju tj napravis event propogation
+do target phase svi ostali elementi parent u buble phaseu
+mijenjaju boju ako imaju event listenetr ,ali parents ne utjeću
+na niži dio dom drva. mijenjat ce boju najdonji element i sve ostale po putu ,ali neće se najnizi mjenjat ako se aktivira parent
+event list function.
+
+e.target
+target-mjesto gdje se desio event mozes ga koristiti da se snalazis
+i ko varijablu
+
+e.currentTarget === this keyword u any event handler
+currentTarget-element na koji je attachan event handler
+
+STOP PROPAGATION
+e.stopPropagation()-u funkciji eventlist zaustavlja medu
+sjebavanje parent elekmenata ,ali nije dobra praksa,ali za silu
+mozes.
+
+CAPTURING PHASE:
+-ako stavis true kao treći parametar addeventlist onda taj element tj njegov istener se aktivira prvi jer po propagation putovanju prvi
+nastupa,default 3. parametsr je false inaće.
+-rijetko se koristi
+
+EVENT DELEGATION: implementing page navigation
+#section--1 -anchors -move the page to element sa id nakon #.
+prvo prevent default zbog anchora onda ostalo u funkciji.
+
+-common practice:-ovako je bolje nego attachanje same event handler
+to multiple elements ovako smo dodali 1 veliki event handler function
+to the parent elements of all elements we are interested in
+and determined where the click event came from i onda matching strategy da ignoriramo clickove koji se nisu dogodili na linku.
+
+//1.add event listener to common parent element
+//2.determine what element originated the event
+document.querySelector(`.nav__links`).addEventListener(`click`, function (e) {
+console.log(e.target);
+e.preventDefault();
+
+//matching strategy
+
+if (e.target.classList.contains(`nav__link`)) {
+const id = e.target.getAttribute(`href`);
+console.log(id);
+document.querySelector(id).scrollIntoView({ behavior: `smooth` });
+}
+});
+
+-delegetion se koristi za elemente koji jos nisu na pageu on runtime (bye the time page loads).
+
+DOM TRAVERSING
+-walking through the dom which means we can select an element
+based on another element.
+-nekad trebamo selectati elemenete relative to sertion other element
+parent ,child...
+
+// going downwards: child
+h1.querySelectorAll(`.highlight`)-sa classom .highlight u elementu
+h1.childNodes-nodeList- sva dijeca tj njihov tekst /content za pogledat
+h1.children-htmlCollection-elements inside samo direct children
+h1.firstElementChild.style.color = `white`;-first child element oboja se u bijelo
+
+h1.lastElementChild.style.color = `black`;-first child element oboja se u black
+
+//going upwards:parentss
+
+h1.parentNode-ko child node samo sa parentom
+h1.parentElement-direct parent html elemennts
+
+## h1.closest(`.header`).style.background = `var(--gradient-secondary)`
+
+-parent ele koji nije direct parent ,stavis query string ko queryselecor u zagrade ,uzme znaci closest parent element sa tom classom u ovom primjeru se mijenja u css varijablu,
+
+//going sideways:siblings
+
+h1.previousElementSibling -prosli sibling znaci u istom elementu
+h1.nextElementSibling - sljedeci sibling u istom elementu
+
+h1.previousSibling-ovo je samo za nodes isto
+h1.nextSibling-nodes isto
+
+//manipuliranje
+npr.
+[...h1.parentElement.children].forEach(function(el){
+if(el !==h1) el.style.transform = `scale(0.5)`;
+})
+-nije array ali je ireterable koji mozemo spreadat u array
+pa mozemo spread operator. svek kaj je drukcije od h1 mijenjas style
+za manje 50%-.
+
+Tabbed component:
+-na puno websites
+-buttons koje kad kliknes area texta se mijenja
+
+//guard clause
+if (!clicked) return;
+
+-koristis da kad zbog closest function se klikne na container a ne zadani button npr da ponistis ucinak clicka na container i ostaje samo na button koji nije definiran sa null.
+
+-znaci za ovo basically trebas vec imat napravljenu clasu active i napravit ove sve buttone sa database i tab drukcijim da bi islo i
+ovako dodajes skrivene tekstove sa displayom koji je bio none na grid kad je active animacija dizanja button i spustanja ostalih tu je bilo
+i selekcije komponenata.
+
+//tabbed component
+const tabs = document.querySelectorAll(`.operations__tab`);
+const tabsContainer = document.querySelector(`.operations__tab-container`);
+const tabsContent = document.querySelectorAll(`.operations__content`);
+tabsContainer.addEventListener(`click`, function (e) {
+const clicked = e.target.closest(`.operations__tab`);
+
+//guard clause
+if (!clicked) return;
+//remove active classes
+tabs.forEach(t => t.classList.remove(`operations__tab--active`));
+tabsContent.forEach(c => c.classList.remove(`operations__content--active`));
+
+//active tab
+clicked.classList.add(`operations__tab--active`);
+
+//activate content area
+document
+.querySelector(`.operations__content--${clicked.dataset.tab}`)
+.classList.add(`operations__content--active`);
+});
+
+PASSING ARGUMENTS TO EVENT HANDLERS:
+-handler function moze uzeti samo 1 argument
+-ovdje smo radili menu fade animation i
+kad smo isli skratiti sa handler function
+prvo smo stavili sa function u nav.addEventListener(`mouseover`, function(e){
+handleHover(e,0.5) pa smo sa bind metodom to jos pojednostavili.
+};
+
+//MENU FADE ANIMATION:
+const handleHover = function (e, opacity) {
+if (e.target.classList.contains(`nav__link`)) {
+const link = e.target;
+const siblings = link.closest(`.nav`).querySelectorAll(`.nav__link`);
+const logo = link.closest(`.nav`).querySelector(`img`);
+
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = this;
+      // this = opacity -je bilo opacity prije bind metode i sa logom isto
+    });
+    logo.style.opacity = this;
+
+}
+};
+//passing `argument` in handler function
+nav.addEventListener(`mouseover`, handleHover.bind(0.5));
+nav.addEventListener(`mouseout`, handleHover.bind(1));
+
+STICKY NAVIGATION:The scroll event
+-navigation bar gets stucked to top of
+the page after we scroll to a certain point.
+
+-addamo sticky class kad dodemo do pozicije neke
+
+//Sticky navigation
+-STARO
+const initialCoords = section1.getBoundingClientRect();
+console.log(initialCoords);
+window.addEventListener(`scroll`, function (e) {
+
+if (window.scrollY > 78) nav.classList.add(`sticky`);
+else nav.classList.remove(`sticky`);
+});
+
+-ja sam stavio 78 poziciju dakad prodem navbar da se krene pojavljivat inace samo ili stavis kordinate manualno ili
+element.top za tocno relativno na element.
+
+NOVO-intersection observer API
+
+-api allows code to observe changes to the was that a
+certain target element intersects another element or
+the way it interests the viewport.
+
+const header = document.querySelector(`.header`);
+const navHeight = nav.getBoundingClientRect().height;
+const stickyNav = function (entries) {
+const [entry] = entries;
+if (!entry.isIntersecting) nav.classList.add(`sticky`);
+else nav.classList.remove(`sticky`);
+};
+const headerObserver = new IntersectionObserver(stickyNav, {
+root: null, //root-element the target is intercepting
+threshold: 0,// treshold -% of interesction at
+// wich observer callback will be called
+rootMargin: `-${navHeight}px`, //rootMargin razmak +-px od targeta
+});
+headerObserver.observe(header);
+
+-znaci moras napravit varijablu
+const observer = new IntersectionObserver(observerCallbackFunction, observerOptions);
+
+u callback fucntion imas argument entries i observer
+
+REVEALING ELEMENTS on SCROLL:
+-animacija je u css-u samo remove i add class kada dodemo
+do target section pomocu api-a (intersectionobserv)
+
+-ovdje koristimo i observer argument kao primjer
+
+//Reveal sections
+const allSections = document.querySelectorAll(`.section`);
+const revealSection = function (entries, observer) {
+const [entry] = entries;
+if (!entry.isIntersecting) return;
+entry.target.classList.remove(`section--hidden`);
+//ovo da ugasis observer kad je obavio funkciju
+observer.unobserve(entry.target);
+};
+const sectionObserver = new IntersectionObserver(revealSection, {
+root: null,
+threshold: 0.15,
+});
+allSections.forEach(function (section) {
+sectionObserver.observe(section);
+section.classList.add(`section--hidden`);
+});
+
+NOVO DEBUGGED :
+-ugl na pocetku se aktivirao observer 4 puta pa smo uzeli njegove elemente
+kao array observera i onda stavili forEach da ne bugga više.
+
+//Reveal sections
+const allSections = document.querySelectorAll(`.section`);
+const revealSection = function (entries, observer) {
+console.log(entries);
+entries.forEach(entry => {
+if (!entry.isIntersecting) return;
+entry.target.classList.remove(`section--hidden`);
+//ovo da ugasis observer kad je obavio funkciju
+observer.unobserve(entry.target);
+});
+};
+const sectionObserver = new IntersectionObserver(revealSection, {
+root: null,
+threshold: 0.15,
+});
+allSections.forEach(function (section) {
+sectionObserver.observe(section);
+section.classList.add(`section--hidden`);
+});
+
+LAZY LOADING IMAGES:
+
+uglavnom stavis malu sliku lose rezolucije sa blurr filterom
+ko src i stavis data-src ko drugi sry prave slike i napravis
+observer aktivaciju loadanja prave slike nakon odredene pozicije
+
+//lazy loading images
+
+const imgTargets = document.querySelectorAll(`img[data-src]`);
+const loadIMG = function (entries, observer) {
+const [entry] = entries;
+if (!entry.isIntersecting) return;
+//replace src with data-src
+
+entry.target.src = entry.target.dataset.src;
+
+entry.target.addEventListener(`load`, function () {
+entry.target.classList.remove(`lazy-img`);
+});
+observer.unobserve(entry.target);
+};
+const imgObserver = new IntersectionObserver(loadIMG, {
+root: null,
+threshold: 0,
+rootMargin: `-200px`,
+});
+
+imgTargets.forEach(img => imgObserver.observe(img));
+
+building a slider component: cijeli postupak 2 videa
+svaka slika slidea dobije klasu. dobije style: transform : translatex na drugim pozicijama -200% ,-100%,0% pa cemo tako manipulirati dalje.zapravo adapt this % as we want and go.
+
+-evo funkcije koju smo dobili
+
+//SLIDER
+const slider = function () {
+const slides = document.querySelectorAll(`.slide`);
+const btnLeft = document.querySelector(`.slider__btn--left`);
+const btnRight = document.querySelector(`.slider__btn--right`);
+let currSlide = 0;
+const maxSlide = slides.length;
+const dotCointainer = document.querySelector(`.dots`);
+
+//functions
+const createDots = function () {
+slides.forEach(function (\_, i) {
+dotCointainer.insertAdjacentHTML(
+`beforeend`,
+`<button class="dots__dot" data-slide="${i}"></button>`
+);
+});
+};
+
+const activateDotBlinkWhileOnItsPage = function (slide) {
+document
+.querySelectorAll(`.dots__dot`)
+.forEach(dot => dot.classList.remove(`dots__dot--active`));
+//ovdje ${slide} mora ići sa "" ne rade nam ``
+    document
+      .querySelector(`.dots__dot[data-slide="${slide}"]`)
+      .classList.add(`dots\_\_dot--active`);
+};
+
+const goToSlide = function (slide) {
+slides.forEach(
+(s, i) => (s.style.transform = ` translateX(${100 * (i - slide)}%)`)
+);
+};
+
+//Next slide
+const nextSlide = function () {
+if (currSlide === maxSlide - 1) {
+currSlide = 0;
+} else {
+currSlide++;
+}
+goToSlide(currSlide);
+activateDotBlinkWhileOnItsPage(currSlide);
+};
+const prevSlide = function () {
+if (currSlide === 0) {
+currSlide = maxSlide - 1;
+} else {
+currSlide--;
+}
+
+    goToSlide(currSlide);
+    activateDotBlinkWhileOnItsPage(currSlide);
+
+};
+const init = function () {
+goToSlide(0);
+createDots();
+activateDotBlinkWhileOnItsPage(0);
+};
+init();
+//event handlers
+btnRight.addEventListener(`click`, nextSlide);
+btnLeft.addEventListener(`click`, prevSlide);
+document.addEventListener(`keydown`, function (e) {
+console.log(e);
+//if
+if (e.key === `ArrowLeft`) prevSlide();
+// or short circuting ,,still cant decide which is my style :(
+e.key === `ArrowRight` && nextSlide();
+});
+dotCointainer.addEventListener(`click`, function (e) {
+if (e.target.classList.contains(`dots__dot`)) {
+currSlide = Number(e.target.dataset.slide);
+goToSlide(currSlide);
+activateDotBlinkWhileOnItsPage(currSlide);
+}
+});
+};
+slider();
+
+## LIFECYCLE DOME EVENTS:
+
+-lifecycle -from the moment page is first accesed until user leaves it
+
+DOM CONTENT LOADED-fired by the document as soon as the HTML is completly parsed(html has been downloaded and been converted in dom tree), ALL SCRIPT MUST BE DOWNLOADED AND EXCEETUTED BEFORE THIS EVEN CAN HAPPEN.
+
+document.addEventListener(`DOMContentLoaded`, function (e) {
+console.log(`HTML parsed and DOM tree built! ,
+     zavrseno ucitavanje prvo`, e);
+});
+
+document.addEventListener(`beforeunload`, function (e) {
+e.preventDefault()
+console.log(e);
+e.returnValue = ``;
+});
+
+-beforeunload kada postoji šansa da će useru podaci biti
+izgubljeni iz nekog razloga korisno ,ali i nepotrebno vecinom
+
+document.addEventListener(`load`, function (e) {
+console.log(`page fully loaded!`, e);
+});
+
+EFFECIENT SCRIPT LOADING: defer and async
+-ovi atributi će utjecat kako je javas downloaded and excetuded
+-pise se u HEAD ili usually BODY END htmla.
+
+2 slike u ucenje slike
+
+<script src = "script.js">
+
+<script async src = "script.js">
+
+<script defer src = "script.js">
+
+
+-za old browsers HTML BODY END.
+Za ostale HEAD:
+ASYNC- scripts not guaranteed to excevute in order
+-use for 3rd party scripts where order doesnt matter
+
+DEFER-for your own scripts and when order matters(best)
